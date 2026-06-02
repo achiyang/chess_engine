@@ -86,7 +86,7 @@ typedef enum PieceType {
 
 typedef uint8_t CastlingRights;
 
-typedef enum CastlingRight {
+enum CastlingRight {
     CASTLING_NONE        = 0,
     CASTLING_WHITE_KING  = 1U << 0,
     CASTLING_WHITE_QUEEN = 1U << 1,
@@ -97,7 +97,7 @@ typedef enum CastlingRight {
         CASTLING_WHITE_QUEEN |
         CASTLING_BLACK_KING |
         CASTLING_BLACK_QUEEN
-} CastlingRight;
+};
 
 static inline int color_is_valid(Color color) {
     return color >= WHITE && color < COLOR_NB;
