@@ -9,6 +9,7 @@ typedef enum Color {
     WHITE    = 0,
     BLACK    = 1,
     BOTH     = 2,
+    SIDE_NB  = 2,
     COLOR_NB = 3,
     NO_COLOR = COLOR_NB
 } Color;
