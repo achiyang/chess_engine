@@ -79,5 +79,5 @@ char notation_side_to_char(Color side) {
             'w' :
         side == BLACK ?
             'b' :
-            '\0';
+            '?';
 }
