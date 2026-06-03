@@ -102,17 +102,9 @@ static const char *parse_side_to_move(Position *pos, const char *str) {
         return NULL;
     }
 
-    char c = *str;
-
-    switch (c) {
-        case 'w':
-            pos->side_to_move = WHITE;
-            break;
-        case 'b':
-            pos->side_to_move = BLACK;
-            break;
-        default:
-            return NULL;
+    pos->side_to_move = notation_side_from_char(*str);
+    if (pos->side_to_move == NO_COLOR) {
+        return NULL;
     }
 
     return (str + 1);
