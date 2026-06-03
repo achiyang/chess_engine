@@ -1,5 +1,7 @@
 #include "fen.h"
 
+#include "notation.h"
+
 #include <stddef.h>
 #include <ctype.h>
 #include <limits.h>
@@ -10,63 +12,6 @@ static const char *skip_spaces(const char *str) {
     }
 
     return str;
-}
-
-static Piece piece_from_char(char c) {
-    switch (c) {
-        case 'P': return WP;
-        case 'N': return WN;
-        case 'B': return WB;
-        case 'R': return WR;
-        case 'Q': return WQ;
-        case 'K': return WK;
-
-        case 'p': return BP;
-        case 'n': return BN;
-        case 'b': return BB;
-        case 'r': return BR;
-        case 'q': return BQ;
-        case 'k': return BK;
-
-        default:  return NO_PIECE;
-    }
-}
-
-static Square square_from_coord(const char *coord) {
-    if (!coord) {
-        return NO_SQUARE;
-    }
-
-    File file;
-    Rank rank;
-
-    switch (coord[0]) {
-        case 'a': file = FILE_A; break;
-        case 'b': file = FILE_B; break;
-        case 'c': file = FILE_C; break;
-        case 'd': file = FILE_D; break;
-        case 'e': file = FILE_E; break;
-        case 'f': file = FILE_F; break;
-        case 'g': file = FILE_G; break;
-        case 'h': file = FILE_H; break;
-
-        default: return NO_SQUARE;
-    }
-
-    switch (coord[1]) {
-        case '1': rank = RANK_1; break;
-        case '2': rank = RANK_2; break;
-        case '3': rank = RANK_3; break;
-        case '4': rank = RANK_4; break;
-        case '5': rank = RANK_5; break;
-        case '6': rank = RANK_6; break;
-        case '7': rank = RANK_7; break;
-        case '8': rank = RANK_8; break;
-
-        default: return NO_SQUARE;
-    }
-
-    return make_square(file, rank);
 }
 
 static const char *parse_int(const char *str, int *out) {
@@ -100,9 +45,9 @@ static const char *parse_piece_placement(Position *pos, const char *str) {
     int rank = RANK_8;
 
     while (1) {
-        char ch = *str;
+        char c = *str;
 
-        Piece piece = piece_from_char(ch);
+        Piece piece = notation_piece_from_char(c);
         if (piece != NO_PIECE) {
             if (file >= FILE_NB) {
                 return NULL;
@@ -114,8 +59,8 @@ static const char *parse_piece_placement(Position *pos, const char *str) {
             ++file; ++str;
         }
 
-        else if (ch >= '1' && ch <= '8') {
-            file += ch - '0';
+        else if (c >= '1' && c <= '8') {
+            file += c - '0';
 
             if (file > FILE_NB) {
                 return NULL;
@@ -127,7 +72,7 @@ static const char *parse_piece_placement(Position *pos, const char *str) {
             }
         }
 
-        else if (ch == '/') {
+        else if (c == '/') {
             if (file != FILE_NB) {
                 return NULL;
             }
@@ -140,7 +85,7 @@ static const char *parse_piece_placement(Position *pos, const char *str) {
             --rank; ++str;
         }
 
-        else if (ch == ' ') {
+        else if (c == ' ') {
             if (file == FILE_NB && rank == RANK_1) {
                 return str;
             }
@@ -157,9 +102,9 @@ static const char *parse_side_to_move(Position *pos, const char *str) {
         return NULL;
     }
 
-    char ch = *str;
+    char c = *str;
 
-    switch (ch) {
+    switch (c) {
         case 'w':
             pos->side_to_move = WHITE;
             break;
@@ -181,9 +126,9 @@ static const char *parse_castling_rights(Position *pos, const char *str) {
     pos->castling_rights = CASTLING_NONE;
 
     while (1) {
-        char ch = *str;
+        char c = *str;
 
-        switch (ch) {
+        switch (c) {
             case '-':
                 if (pos->castling_rights != CASTLING_NONE) {
                     return NULL;
@@ -243,7 +188,7 @@ static const char *parse_en_passant(Position *pos, const char *str) {
         return (str + 1);
     }
 
-    Square square = square_from_coord(str);
+    Square square = notation_square_from_coord(str);
     if (square == NO_SQUARE) {
         return NULL;
     }
