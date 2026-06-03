@@ -31,6 +31,17 @@ static const SquareDelta king_attack_deltas[8] = {
     { -1, -1 }, { 0, -1 }, { 1, -1 }
 };
 
+static const SquareDelta bishop_directions[4] = {
+    { -1,  1 }, { 1,  1 },
+    { -1, -1 }, { 1, -1 }
+};
+
+static const SquareDelta rook_directions[4] = {
+    { 0,  1 },
+    { -1, 0 }, { 1, 0 },
+    { 0, -1 }
+};
+
 static Square square_apply_delta(Square square, SquareDelta delta) {
     int file = square_file(square) + delta.df;
     int rank = square_rank(square) + delta.dr;
@@ -80,6 +91,36 @@ static void init_king_attackers(void) {
     }
 }
 
+static int is_attacked_by_slider(
+    const Position *pos,
+    Square square,
+    const SquareDelta directions[],
+    int direction_count,
+    Piece slider,
+    Piece queen
+) {
+    for (int dir = 0; dir < direction_count; ++dir) {
+        Square current = square_apply_delta(square, directions[dir]);
+
+        while (current != NO_SQUARE) {
+            Piece piece = pos->board[current];
+
+            if (piece != NO_PIECE) {
+                if (piece == slider || piece == queen) {
+                    return 1;
+                }
+                else {
+                    break;
+                }
+            }
+
+            current = square_apply_delta(current, directions[dir]);
+        }
+    }
+
+    return 0;
+}
+
 void attack_init(void) {
     init_pawn_attackers();
     init_knight_attackers();
@@ -89,6 +130,9 @@ void attack_init(void) {
 int position_is_square_attacked(const Position *pos, Square square, Color attacker) {
     Piece pawn = make_piece(attacker, PAWN);
     Piece knight = make_piece(attacker, KNIGHT);
+    Piece bishop = make_piece(attacker, BISHOP);
+    Piece rook = make_piece(attacker, ROOK);
+    Piece queen = make_piece(attacker, QUEEN);
     Piece king = make_piece(attacker, KING);
 
     if (pawn_attackers[attacker][square] & pos->pieces[pawn]) {
@@ -100,6 +144,14 @@ int position_is_square_attacked(const Position *pos, Square square, Color attack
     }
 
     if (king_attackers[square] & pos->pieces[king]) {
+        return 1;
+    }
+
+    if (is_attacked_by_slider(pos, square, bishop_directions, 4, bishop, queen)) {
+        return 1;
+    }
+
+    if (is_attacked_by_slider(pos, square, rook_directions, 4, rook, queen)) {
         return 1;
     }
 
