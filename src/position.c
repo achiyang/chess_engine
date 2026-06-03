@@ -1,11 +1,12 @@
 #include "position.h"
 
 #include "bitboard.h"
+#include "notation.h"
 
 #include <string.h>
 
 void position_clear(Position *pos) {
-    for (Square square = 0; square < SQUARE_NB; ++square) {
+    for (Square square = A1; square < SQUARE_NB; ++square) {
         pos->board[square] = NO_PIECE;
     }
 
@@ -115,7 +116,7 @@ PositionStatus position_validate(const Position *pos) {
     Bitboard expected_pieces[PIECE_NB] = { 0 };
     Bitboard expected_occupancies[COLOR_NB] = { 0 };
 
-    for (Square square = 0; square < SQUARE_NB; ++square) {
+    for (Square square = A1; square < SQUARE_NB; ++square) {
         Piece piece = pos->board[square];
 
         if (!piece_is_valid(piece) && piece != NO_PIECE) {
@@ -142,7 +143,7 @@ PositionStatus position_validate(const Position *pos) {
         status |= POSITION_ERROR_PIECES_MISMATCH;
     }
     else {
-        for (Piece piece = 0; piece < PIECE_NB; ++piece) {
+        for (Piece piece = WP; piece < PIECE_NB; ++piece) {
             if (pos->pieces[piece] != expected_pieces[piece]) {
                 status |= POSITION_ERROR_PIECES_MISMATCH;
                 break;
@@ -155,7 +156,7 @@ PositionStatus position_validate(const Position *pos) {
         status |= POSITION_ERROR_OCCUPANCY_MISMATCH;
     }
     else {
-        for (Color color = 0; color < SIDE_NB; ++color) {
+        for (Color color = WHITE; color < SIDE_NB; ++color) {
             if (pos->occupancies[color] != expected_occupancies[color]) {
                 status |= POSITION_ERROR_OCCUPANCY_MISMATCH;
             }
