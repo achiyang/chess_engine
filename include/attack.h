@@ -25,7 +25,7 @@ void attack_init(void);
  * - attack_init()이 먼저 호출되어 있어야 한다.
  *
  * Effect:
- * - square가 attacker side의 piece들에게 공격받고 있는지 확인한다.
+ * - square가 attacker side에 의해 attacked 상태인지 확인한다.
  *
  * Return:
  * - 공격받고 있으면 true, 아니면 false.
