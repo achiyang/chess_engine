@@ -1,17 +1,17 @@
-#include "attack.h"
+#include "attacks.h"
 
 #include "bitboard.h"
+
+static Bitboard pawn_attacks[SIDE_NB][SQUARE_NB];
+static Bitboard knight_attacks[SQUARE_NB];
+static Bitboard king_attacks[SQUARE_NB];
 
 typedef struct SquareDelta {
     int df;
     int dr;
 } SquareDelta;
 
-static Bitboard pawn_attackers[SIDE_NB][SQUARE_NB];
-static Bitboard knight_attackers[SQUARE_NB];
-static Bitboard king_attackers[SQUARE_NB];
-
-static const SquareDelta pawn_attack_deltas[SIDE_NB][2] = {
+static const SquareDelta pawn_deltas[SIDE_NB][2] = {
     {
         { -1,  1 }, { 1,  1 }
     },
@@ -20,14 +20,14 @@ static const SquareDelta pawn_attack_deltas[SIDE_NB][2] = {
     }
 };
 
-static const SquareDelta knight_attack_deltas[8] = {
+static const SquareDelta knight_deltas[8] = {
     { -1,  2 }, { 1,  2 },
     { -2,  1 }, { 2,  1 },
     { -2, -1 }, { 2, -1 },
     { -1, -2 }, { 1, -2 }
 };
 
-static const SquareDelta king_attack_deltas[8] = {
+static const SquareDelta king_deltas[8] = {
     { -1,  1 }, { 0,  1 }, { 1,  1 },
     { -1,  0 },            { 1,  0 },
     { -1, -1 }, { 0, -1 }, { 1, -1 }
@@ -55,6 +55,96 @@ static Square square_apply_delta(Square square, SquareDelta delta) {
     return square_make((File)file, (Rank)rank);
 }
 
+static void init_pawn_attacks(void) {
+    for (Color side = WHITE; side < SIDE_NB; ++side) {
+        for (Square square = A1; square < SQUARE_NB; ++square) {
+            for (int i = 0; i < 2; ++i) {
+                Square attack_square = square_apply_delta(square, pawn_deltas[side][i]);
+
+                if (attack_square != NO_SQUARE) {
+                    pawn_attacks[side][square] |= square_bb(attack_square);
+                }
+            }
+        }
+    }
+}
+
+static void init_knight_attacks(void) {
+    for (Square square = A1; square < SQUARE_NB; ++square) {
+        for (int i = 0; i < 8; ++i) {
+            Square attack_square = square_apply_delta(square, knight_deltas[i]);
+
+            if (attack_square != NO_SQUARE) {
+                knight_attacks[square] |= square_bb(attack_square);
+            }
+        }
+    }
+}
+
+static void init_king_attacks(void) {
+    for (Square square = A1; square < SQUARE_NB; ++square) {
+        for (int i = 0; i < 8; ++i) {
+            Square attack_square = square_apply_delta(square, king_deltas[i]);
+
+            if (attack_square != NO_SQUARE) {
+                king_attacks[square] |= square_bb(attack_square);
+            }
+        }
+    }
+}
+
+static Bitboard attacks_sliding(
+    Square from,
+    Bitboard occupied,
+    SquareDelta directions,
+    int direction_count
+) {
+    
+}
+
+void attacks_init(void) {
+    init_pawn_attacks();
+    init_knight_attacks();
+    init_king_attacks();
+}
+
+Bitboard attacks_pawn(Color side, Square from) {
+    return pawn_attacks[side][from];
+}
+
+Bitboard attacks_knight(Square from) {
+    return knight_attacks[from];
+}
+
+Bitboard attacks_king(Square from) {
+    return king_attacks[from];
+}
+
+Bitboard attacks_bishop(Square from, Bitboard occupied) {
+
+}
+
+Bitboard attacks_rook(Square from, Bitboard occupied) {
+
+}
+
+Bitboard attacks_queen(Square from, Bitboard occupied) {
+
+}
+
+Bitboard position_attackers_to(const Position *pos, Square square) {
+
+}
+
+int position_is_square_attacked(const Position *pos, Square square, Color attacker) {
+
+}
+
+int position_is_in_check(const Position *pos, Color side) {
+
+}
+
+/*
 static void init_pawn_attackers(void) {
     for (Color side = WHITE; side < SIDE_NB; ++side) {
         for (Square square = A1; square < SQUARE_NB; ++square) {
@@ -168,3 +258,4 @@ int position_is_in_check(const Position *pos, Color side) {
 
     return position_is_square_attacked(pos, square, attacker);
 }
+*/
