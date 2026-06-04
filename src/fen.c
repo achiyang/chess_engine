@@ -53,7 +53,7 @@ static const char *parse_piece_placement(Position *pos, const char *str) {
                 return NULL;
             }
 
-            Square square = make_square((File)file, (Rank)rank);
+            Square square = square_make((File)file, (Rank)rank);
             position_set_piece(pos, piece, square);
 
             ++file; ++str;

@@ -52,7 +52,7 @@ Square notation_square_from_coord(const char *coord) {
         return NO_SQUARE;
     }
 
-    return make_square((File)file, (Rank)rank);
+    return square_make((File)file, (Rank)rank);
 }
 
 void notation_square_to_coord(Square square, char out[3]) {

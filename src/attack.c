@@ -52,7 +52,7 @@ static Square square_apply_delta(Square square, SquareDelta delta) {
         return NO_SQUARE;
     }
 
-    return make_square((File)file, (Rank)rank);
+    return square_make((File)file, (Rank)rank);
 }
 
 static void init_pawn_attackers(void) {
@@ -130,12 +130,12 @@ void attack_init(void) {
 }
 
 int position_is_square_attacked(const Position *pos, Square square, Color attacker) {
-    Piece pawn = make_piece(attacker, PAWN);
-    Piece knight = make_piece(attacker, KNIGHT);
-    Piece bishop = make_piece(attacker, BISHOP);
-    Piece rook = make_piece(attacker, ROOK);
-    Piece queen = make_piece(attacker, QUEEN);
-    Piece king = make_piece(attacker, KING);
+    Piece pawn = piece_make(attacker, PAWN);
+    Piece knight = piece_make(attacker, KNIGHT);
+    Piece bishop = piece_make(attacker, BISHOP);
+    Piece rook = piece_make(attacker, ROOK);
+    Piece queen = piece_make(attacker, QUEEN);
+    Piece king = piece_make(attacker, KING);
 
     if (pawn_attackers[attacker][square] & pos->pieces[pawn]) {
         return 1;
@@ -161,7 +161,7 @@ int position_is_square_attacked(const Position *pos, Square square, Color attack
 }
 
 int position_is_in_check(const Position *pos, Color side) {
-    Piece king = make_piece(side, KING);
+    Piece king = piece_make(side, KING);
     Bitboard king_bb = pos->pieces[king];
     Square square = bitboard_lsb(king_bb);
     Color attacker = opposite_side(side);

@@ -132,7 +132,7 @@ static inline Rank square_rank(Square square) {
     return (Rank)(square >> 3);
 }
 
-static inline Square make_square(File file, Rank rank) {
+static inline Square square_make(File file, Rank rank) {
     return (Square)((rank << 3) | file);
 }
 
@@ -152,7 +152,7 @@ static inline Color piece_color_of(Piece piece) {
     return (Color)(piece / PIECE_TYPE_NB);
 }
 
-static inline Piece make_piece(Color side, PieceType piece_type) {
+static inline Piece piece_make(Color side, PieceType piece_type) {
     return (Piece)(piece_type + (side * PIECE_TYPE_NB));
 }
 

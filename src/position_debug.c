@@ -7,7 +7,7 @@ void position_print(const Position *pos, FILE *out) {
         fprintf(out, "%d  ", rank + 1);
 
         for (int file = FILE_A; file < FILE_NB; ++file) {
-            Square square = make_square((File)file, (Rank)rank);
+            Square square = square_make((File)file, (Rank)rank);
             Piece piece = pos->board[square];
 
             fprintf(out, "%c ", notation_piece_to_char(piece));
