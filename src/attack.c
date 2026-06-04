@@ -1,5 +1,7 @@
 #include "attack.h"
 
+#include "bitboard.h"
+
 typedef struct SquareDelta {
     int df;
     int dr;
@@ -156,4 +158,13 @@ int position_is_square_attacked(const Position *pos, Square square, Color attack
     }
 
     return 0;
+}
+
+int position_is_in_check(const Position *pos, Color side) {
+    Piece king = make_piece(side, KING);
+    Bitboard king_bb = pos->pieces[king];
+    Square square = bitboard_lsb(king_bb);
+    Color attacker = opposite_side(side);
+
+    return position_is_square_attacked(pos, square, attacker);
 }

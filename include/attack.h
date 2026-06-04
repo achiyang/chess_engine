@@ -32,4 +32,19 @@ void attack_init(void);
  */
 int position_is_square_attacked(const Position *pos, Square square, Color attacker);
 
+/*
+ * Precondition:
+ * - pos != NULL
+ * - side_is_valid(side)
+ * - side의 king이 정확히 하나 존재한다.
+ * - attack_init()이 먼저 호출되어 있어야 한다.
+ *
+ * Effect:
+ * - side의 king이 opposite side에 의해 attacked 상태인지 확인한다.
+ *
+ * Return:
+ * - check 상태이면 true, 아니면 false.
+ */
+int position_is_in_check(const Position *pos, Color side);
+
 #endif
