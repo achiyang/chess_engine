@@ -8,8 +8,8 @@ typedef uint64_t Bitboard;
 typedef enum Color {
     WHITE    = 0,
     BLACK    = 1,
-    BOTH     = 2,
     SIDE_NB  = 2,
+    BOTH     = SIDE_NB,
     COLOR_NB = 3,
     NO_COLOR = COLOR_NB
 } Color;
@@ -100,11 +100,11 @@ enum CastlingRight {
         CASTLING_BLACK_QUEEN
 };
 
-static inline int color_is_valid(Color color) {
+static inline int color_is_valid(int color) {
     return color >= WHITE && color < COLOR_NB;
 }
 
-static inline int side_is_valid(Color side) {
+static inline int side_is_valid(int side) {
     return side == WHITE || side == BLACK;
 }
 
@@ -112,15 +112,15 @@ static inline Color opposite_side(Color side) {
     return (Color)(side ^ 1);
 }
 
-static inline int square_is_valid(Square square) {
+static inline int square_is_valid(int square) {
     return square >= A1 && square < SQUARE_NB;
 }
 
-static inline int file_is_valid(File file) {
+static inline int file_is_valid(int file) {
     return file >= FILE_A && file < FILE_NB;
 }
 
-static inline int rank_is_valid(Rank rank) {
+static inline int rank_is_valid(int rank) {
     return rank >= RANK_1 && rank < RANK_NB;
 }
 
@@ -140,7 +140,7 @@ static inline Bitboard square_bb(Square square) {
     return (Bitboard)(1ULL << square);
 }
 
-static inline int piece_is_valid(Piece piece) {
+static inline int piece_is_valid(int piece) {
     return piece >= WP && piece < PIECE_NB;
 }
 
