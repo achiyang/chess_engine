@@ -4,6 +4,6 @@
 #include "position.h"
 #include "movelist.h"
 
-void movegen_generate_pseudo_legal(Position *pos, MoveList *list);
+void movegen_generate_pseudo_legal(const Position *pos, MoveList *list);
 
 #endif
