@@ -83,6 +83,30 @@ static inline Square bitboard_pop_lsb(Bitboard *bb) {
 }
 
 /*
+ * Precondition:
+ * - bb != 0
+ *
+ * Effect:
+ * - bb의 most significant set bit에 해당하는 square를 구한다.
+ *
+ * Return:
+ * - most significant set bit의 Square.
+ */
+static inline Square bitboard_msb(Bitboard bb) {
+#if defined(__clang__) || defined(__GNUC__)
+    return (Square)(63 - __builtin_clzll((unsigned long long)bb));
+#else
+    Square square = NO_SQUARE;
+
+    while (bb) {
+        square = bitboard_pop_lsb(&bb);
+    }
+
+    return square;
+#endif
+}
+
+/*
  * Effect:
  * - bb에 set된 bit 개수를 센다.
  *
