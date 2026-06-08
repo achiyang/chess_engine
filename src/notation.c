@@ -48,7 +48,7 @@ Square notation_square_from_coord(const char *coord) {
     int file = coord[0] - 'a';
     int rank = coord[1] - '1';
     
-    if (file < FILE_A || file >= FILE_NB || rank < RANK_1 || rank >= RANK_NB) {
+    if (!file_is_valid(file) || !rank_is_valid(rank)) {
         return NO_SQUARE;
     }
 
