@@ -41,9 +41,125 @@ static void add_moves_from_targets(
     }
 }
 
+static void add_pawn_promotions_from_targets(
+    MoveList *list,
+    Bitboard targets,
+    int move_delta,
+    MoveFlags flags
+) {
+    while (targets) {
+        Square to = bitboard_pop_lsb(&targets);
+        Square from = (Square)((int)to - move_delta);
+
+        for (PieceType promotion = KNIGHT; promotion <= QUEEN; ++promotion) {
+            move_list_add(
+                list,
+                move_make(
+                    from,
+                    to,
+                    flags | MOVE_FLAG_PROMOTION,
+                    promotion
+                )
+            );
+        }
+    }
+}
+
+static void add_pawn_moves_from_targets(
+    MoveList *list,
+    Bitboard targets,
+    int move_delta,
+    MoveFlags flags
+) {
+    while (targets) {
+        Square to = bitboard_pop_lsb(&targets);
+        Square from = (Square)((int)to - move_delta);
+
+        move_list_add(
+            list,
+            move_make(
+                from,
+                to,
+                flags,
+                NO_PIECE_TYPE
+            )
+        );
+    }
+}
+
+static void generate_white_pawn_moves(const Position *pos, MoveList *list) {
+    Bitboard enemy_occ = pos->occupancies[BLACK];
+    Bitboard all_occ = pos->occupancies[BOTH];
+    Bitboard empty = ~all_occ;
+
+    Bitboard pawns = pos->pieces[WP];
+
+    /*
+     * 1. single push
+     */
+    Bitboard single_targets = (pawns << 8) & empty;
+    Bitboard normal_pushes = single_targets & ~BB_RANK_8;
+    Bitboard promotion_pushes = single_targets & BB_RANK_8;
+
+    /*
+     * 2. double push
+     */
+    Bitboard one_step_from_start = ((pawns & BB_RANK_2) << 8) & empty;
+    Bitboard double_targets = (one_step_from_start << 8) & empty;
+
+    /*
+     * 3. capture
+     */
+    Bitboard capture_west_targets = ((pawns & BB_NOT_FILE_A) << 7) & enemy_occ;
+    Bitboard capture_east_targets = ((pawns & BB_NOT_FILE_H) << 9) & enemy_occ;
+
+    Bitboard normal_capture_west = capture_west_targets & ~BB_RANK_8;
+    Bitboard promo_capture_west  = capture_west_targets & BB_RANK_8;
+
+    Bitboard normal_capture_east = capture_east_targets & ~BB_RANK_8;
+    Bitboard promo_capture_east  = capture_east_targets & BB_RANK_8;
+}
+
+static void generate_black_pawn_moves(const Position *pos, MoveList *list) {
+    Bitboard enemy_occ = pos->occupancies[WHITE];
+    Bitboard all_occ = pos->occupancies[BOTH];
+    Bitboard empty = ~all_occ;
+
+    Bitboard pawns = pos->pieces[BP];
+
+    /*
+     * 1. single push
+     */
+    Bitboard single_targets = (pawns >> 8) & empty;
+    Bitboard normal_pushes = single_targets & ~BB_RANK_1;
+    Bitboard promotion_pushes = single_targets & BB_RANK_1;
+
+    /*
+     * 2. double push
+     */
+    Bitboard one_step_from_start = ((pawns & BB_RANK_7) >> 8) & empty;
+    Bitboard double_targets = (one_step_from_start >> 8) & empty;
+
+    /*
+     * 3. capture
+     */
+    Bitboard capture_west_targets = ((pawns & BB_NOT_FILE_A) >> 9) & enemy_occ;
+    Bitboard capture_east_targets = ((pawns & BB_NOT_FILE_H) >> 7) & enemy_occ;
+
+    Bitboard normal_capture_west = capture_west_targets & ~BB_RANK_1;
+    Bitboard promo_capture_west  = capture_west_targets & BB_RANK_1;
+
+    Bitboard normal_capture_east = capture_east_targets & ~BB_RANK_1;
+    Bitboard promo_capture_east  = capture_east_targets & BB_RANK_1;
+}
+
 static void generate_pawn_moves(const Position *pos, MoveList *list) {
-    (void)pos;
-    (void)list;
+    if (pos->side_to_move == WHITE) {
+        generate_white_pawn_moves(pos, list);
+    }
+    else {
+        generate_black_pawn_moves(pos, list);
+    }
 }
 
 static void generate_knight_moves(const Position *pos, MoveList *list) {
