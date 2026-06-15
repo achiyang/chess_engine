@@ -27,9 +27,9 @@
  * - 현재 side_to_move의 pseudo-legal moves를 생성한다.
  *
  * Note:
- * - king safety는 검사하지 않는다.
+ * - 일반 move에 대해서는 king safety를 검사하지 않는다.
+ * - 단, castling move는 규칙상 필요한 attacked square 검사를 수행한 뒤 생성한다.
  * - pinned piece move, illegal king move, illegal en passant move가 포함될 수 있다.
- * - 현재 구현은 castling move를 생성하지 않는다.
  */
 void movegen_generate_pseudo_legal(const Position *pos, MoveList *list);
 
@@ -50,8 +50,8 @@ void movegen_generate_pseudo_legal(const Position *pos, MoveList *list);
  *
  * Note:
  * - pinned piece move, illegal king move, illegal en passant move를 제거한다.
- * - 현재 pseudo-legal generator가 castling move를 생성하지 않으므로,
- *   legal move list에도 castling move는 포함되지 않는다.
+ * - castling move는 pseudo-legal generation 단계에서
+ *   castling-specific legality 조건을 만족하는 경우에만 생성된다.
  */
 void movegen_generate_legal(Position *pos, MoveList *list);
 
