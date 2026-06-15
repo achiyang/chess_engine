@@ -2,6 +2,7 @@
 
 #include "attacks.h"
 #include "bitboard.h"
+#include "make_move.h"
 
 enum {
     PROMOTION_TYPE_NB = 4
@@ -412,6 +413,93 @@ static void generate_king_moves(const Position *pos, MoveList *list) {
     add_moves_from_targets(list, from, targets, enemy_occ);
 }
 
+static void generate_castling_moves(const Position *pos, MoveList *list) {
+    Color side = pos->side_to_move;
+    Color attacker = opposite_side(side);
+
+    if (side == WHITE &&
+        pos->board[E1] == WK &&
+        !position_is_square_attacked(pos, E1, attacker)) {
+        if (pos->castling_rights & CASTLING_WHITE_KING) {
+            if (pos->board[H1] == WR &&
+                pos->board[F1] == NO_PIECE &&
+                pos->board[G1] == NO_PIECE &&
+                !position_is_square_attacked(pos, F1, attacker) &&
+                !position_is_square_attacked(pos, G1, attacker)) {
+                move_list_add(
+                    list,
+                    move_make(
+                        E1,
+                        G1,
+                        MOVE_FLAG_CASTLING,
+                        NO_PIECE_TYPE
+                    )
+                );
+            }
+        }
+
+        if (pos->castling_rights & CASTLING_WHITE_QUEEN) {
+            if (pos->board[A1] == WR &&
+                pos->board[D1] == NO_PIECE &&
+                pos->board[C1] == NO_PIECE &&
+                pos->board[B1] == NO_PIECE &&
+                !position_is_square_attacked(pos, D1, attacker) &&
+                !position_is_square_attacked(pos, C1, attacker)) {
+                move_list_add(
+                    list,
+                    move_make(
+                        E1,
+                        C1,
+                        MOVE_FLAG_CASTLING,
+                        NO_PIECE_TYPE
+                    )
+                );
+            }
+        }
+    }
+
+    if (side == BLACK &&
+        pos->board[E8] == BK &&
+        !position_is_square_attacked(pos, E8, attacker)) {
+        if (pos->castling_rights & CASTLING_BLACK_KING) {
+            if (pos->board[H8] == BR &&
+                pos->board[F8] == NO_PIECE &&
+                pos->board[G8] == NO_PIECE &&
+                !position_is_square_attacked(pos, F8, attacker) &&
+                !position_is_square_attacked(pos, G8, attacker)) {
+                move_list_add(
+                    list,
+                    move_make(
+                        E8,
+                        G8,
+                        MOVE_FLAG_CASTLING,
+                        NO_PIECE_TYPE
+                    )
+                );
+            }
+        }
+
+        if (pos->castling_rights & CASTLING_BLACK_QUEEN) {
+            if (pos->board[A8] == BR &&
+                pos->board[D8] == NO_PIECE &&
+                pos->board[C8] == NO_PIECE &&
+                pos->board[B8] == NO_PIECE &&
+                !position_is_square_attacked(pos, D8, attacker) &&
+                !position_is_square_attacked(pos, C8, attacker)) {
+                move_list_add(
+                    list,
+                    move_make(
+                        E8,
+                        C8,
+                        MOVE_FLAG_CASTLING,
+                        NO_PIECE_TYPE
+                    )
+                );
+            }
+        }
+    }
+}
+
 void movegen_generate_pseudo_legal(const Position *pos, MoveList *list) {
     move_list_clear(list);
 
@@ -421,4 +509,27 @@ void movegen_generate_pseudo_legal(const Position *pos, MoveList *list) {
     generate_rook_moves(pos, list);
     generate_queen_moves(pos, list);
     generate_king_moves(pos, list);
+    generate_castling_moves(pos, list);
+}
+
+void movegen_generate_legal(Position *pos, MoveList *list) {
+    MoveList pseudo_list;
+    movegen_generate_pseudo_legal(pos, &pseudo_list);
+
+    move_list_clear(list);
+
+    Color side = pos->side_to_move;
+
+    for (int i = 0; i < pseudo_list.count; ++i) {
+        Move move = pseudo_list.moves[i];
+        PositionUndo undo;
+
+        position_make_move(pos, move, &undo);
+
+        if (!position_is_in_check(pos, side)) {
+            move_list_add(list, move);
+        }
+
+        position_unmake_move(pos, move, &undo);
+    }
 }
